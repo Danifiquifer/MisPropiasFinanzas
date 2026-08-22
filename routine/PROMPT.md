@@ -62,19 +62,36 @@ cada corrida:
    categorías + sub-base "Discriminado" por categoría — desde el 22 ago
    2026 esto se automatizó también, antes era 100% manual): por cada
    movimiento nuevo de HOY que quedó en "🤖 Transacciones (Auto)":
-   1. Si no existe todavía una página del mes actual en "Meses
-      Presupuesto YT", creala (`Mes` = nombre del mes, `Fecha` = día 1).
-   2. Si no existe una fila en "Registro de Gastos" con `Nombre` = la
-      Categoría del movimiento relacionada (`Mes`) a ese mes, creala
-      (`Tipo de movimiento`: Ingresos para Salario, Deuda para
+   1. **Primero revisá si ya existe una página del mes actual en "Meses
+      Presupuesto YT" ANTES de crear una nueva** — buscala por nombre
+      (ej. "Agosto"). ⚠️ OJO: los meses se reutilizan por nombre sin año
+      (la página "Agosto" que ya existe puede ser de un año viejo, p. ej.
+      tiene `Fecha` = 2024-08-01). Si la que encontrás es de un año
+      anterior, NO la reutilices para datos del año actual — vas a mezclar
+      datos de años distintos en la misma página. En ese caso creá una
+      página nueva para el mes/año actual.
+   2. Si creaste una página de mes nueva, **las pestañas ("views") de
+      "Registro de Gastos" están hardcodeadas a una página específica por
+      nombre de mes** (ej. la pestaña "Agosto" filtra por la página
+      "Agosto" de 2024, no se actualiza sola). Repuntar el filtro de una
+      pestaña existente vía la API no es confiable (dejó un filtro
+      "simple" viejo compitiendo con uno "avanzado" nuevo, y Notion prioriza
+      el viejo). En vez de pelear con eso: creá una pestaña NUEVA con
+      `notion-create-view`, nombrada `"<Mes> <Año>"` (ej. "Agosto 2026"),
+      con `FILTER "Mes" = "<url de la página del mes nueva>"`. Verificá con
+      `notion-query-data-sources` en modo `view` que la pestaña nueva
+      realmente devuelve las filas antes de darlo por hecho.
+   3. Si no existe una fila en "Registro de Gastos" con `Nombre` = la
+      Categoría del movimiento relacionada (`Mes`) a esa página de mes,
+      creala (`Tipo de movimiento`: Ingresos para Salario, Deuda para
       Crédito hipotecario/deudas, Gastos esenciales para
       Mercado/Transporte/Servicios/Coco/Maestría, Gastos no esenciales
       para el resto, Ahorros para Ahorro).
-   3. Si esa página de categoría no tiene todavía una base hija
+   4. Si esa página de categoría no tiene todavía una base hija
       "Discriminado", creala con el esquema
       `CREATE TABLE ("Concepto" TITLE, "Valor" NUMBER)` (mismo esquema
       que ya usaba Daniela en meses anteriores).
-   4. Agregá una fila en ese "Discriminado": `Concepto` = comercio +
+   5. Agregá una fila en ese "Discriminado": `Concepto` = comercio +
       fuente entre paréntesis (ej. "Peaje Fusca (TC Davivienda)"),
       `Valor` = el monto. No dupliques si ya está (mismo `Concepto` +
       `Valor` ya cargado ese día).

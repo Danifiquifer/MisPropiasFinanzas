@@ -225,6 +225,19 @@ El cupo real usado en el ciclo vigente, tras todas las correcciones, es
 **$1.773.611** (solo Uber $8.131 + todo del 20 al 22 de agosto, incluida
 la cuota de la maestría $1.676.480). A partir de aquí la Rutina programada
 mantiene esto al día —incluyendo, desde el mismo 22 ago, el espejo diario
-en "Registro de Gastos" (se creó el mes "Agosto" ahí por primera vez, con
-las categorías Transporte y Comidas y sus correspondientes "Discriminado",
-para reflejar los movimientos del 22 de agosto).
+en "Registro de Gastos".
+
+**Trampa descubierta al hacer ese primer espejo**: "Registro de Gastos"
+ya tenía una pestaña ("view") llamada "Agosto" — pero de **2024**, no de
+2026. Los meses se reutilizan por nombre sin año en todo este sistema
+(Enero, Febrero, ... Diciembre son pestañas fijas, cada una apuntando a
+una página de mes específica y vieja). El primer intento de espejo creó
+una página de mes "Agosto" nueva para 2026 en vez de reusar esa, así que
+los datos quedaron en una página distinta a la que la pestaña "Agosto"
+filtra — invisibles para Daniela. Repuntar el filtro de la pestaña vieja
+por API tampoco funcionó de forma confiable (Notion guarda un filtro
+"simple" y uno "avanzado" por separado, y `CLEAR FILTER` solo limpia el
+avanzado; el simple —el viejo, apuntando a 2024— seguía ganando). La
+solución fue crear una pestaña nueva, **"Agosto 2026"**, con su propio
+filtro apuntando a la página de mes correcta. Ver el paso 6 de
+`routine/PROMPT.md` para el procedimiento que evita repetir esto cada mes.
