@@ -160,12 +160,39 @@ Definidos en `finanzas_agent/limits.py`:
 - **$2.500.000** — evita el cobro de cuota de manejo.
 - **$3.000.000** — cupo máximo que Daniela se propuso no cruzar.
 
-El agente suma `Valor` donde `Fuente = TC Davivienda` y `Tipo = Gasto` en el
-mes en curso, y compara contra ambos umbrales.
+El agente suma `Valor` donde `Fuente = TC Davivienda` y `Tipo = Gasto` **del
+ciclo de facturación actual** (no del mes calendario — ver siguiente
+sección), y compara contra ambos umbrales.
+
+## Ciclo de facturación vs. mes calendario
+
+Primer error real que se detectó (22 ago 2026): el cupo de la TC no se
+resetea por mes calendario, se libera cuando Daniela **paga el extracto**.
+El 20 de agosto pagó $3.511.179 por PSE desde Falabella — eso saldó todo lo
+que ya estaba facturado en el ciclo anterior. Cargar todos los correos de
+"Compra" de agosto como si fueran del ciclo actual sobreestimó el cupo
+usado ($2.688.520 en vez del real $2.034.925).
+
+**No hay forma de inferir el corte exacto solo con la fecha** — al
+reconciliar con Daniela, confirmó que algunas compras de antes del 20
+(True Blue 15 ago, Lozano Muñoz 17 ago, Rappi 18 ago, Uber 19 ago) sí son
+del ciclo actual, mientras que otras de fechas intermedias (ej. EDS
+gasolina o Cabaña Sopó, ambas del 15-16 ago) ya estaban en el ciclo
+anterior. Por eso, en Notion cada transacción de TC tiene un campo `Mes`
+que en vez del mes calendario indica el ciclo: `"Agosto"` para el ciclo
+actual o `"Ciclo anterior (pagado {fecha})"` para lo ya saldado. El agente
+NO mueve transacciones de ciclo automáticamente por fecha; cuando detecta
+un pago nuevo de TC (`Pago TC Davivienda (PSE)`), debe preguntarle a
+Daniela cuáles de las transacciones pendientes quedaron cubiertas por ese
+pago antes de recalcular el cupo. Ver el paso de reconciliación en
+`routine/PROMPT.md`.
 
 ## Estado actual (backfill inicial)
 
 Se cargaron manualmente en Notion las transacciones de TC de Davivienda del
 1 al 22 de agosto de 2026 (29 movimientos) más algunas de la cuenta débito
 de Falabella a modo de ejemplo, para dejar el dashboard de cupo funcionando
-desde ya. A partir de aquí la Rutina programada mantiene esto al día.
+desde ya. Tras la reconciliación con Daniela, 18 de esos 29 movimientos
+quedaron marcados como ciclo anterior (ya pagado) y 11 como ciclo actual —
+el cupo real usado en el ciclo vigente es $2.034.925. A partir de aquí la
+Rutina programada mantiene esto al día.

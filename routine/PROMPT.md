@@ -39,13 +39,32 @@ cada corrida:
    (1)"). Antes de crear una fila, verificá que no exista ya una con el
    mismo `ID Correo` (deduplicación).
 
-5. **Recalculá el bloque "💳 Cupo Tarjeta de Crédito Davivienda Lifemiles
-   Gold"** al final de la página "Presupuesto Personal (1)": sumá `Valor`
-   donde `Fuente = TC Davivienda` y `Tipo = Gasto` en el mes en curso, y
-   actualizá los porcentajes contra $2.500.000 (evitar cuota de manejo) y
-   $3.000.000 (cupo máximo). Actualizá también la fecha de corte.
+5. **Reconciliación de ciclo de facturación (solo si esta corrida trajo un
+   correo PSE nuevo con `Comercio = Davivienda` y `Descripción` conteniendo
+   "Tarjeta Credito", es decir un pago del extracto de la TC):** el cupo NO
+   se resetea por mes calendario, se libera cuando Daniela paga el
+   extracto. Preguntale en el chat cuáles de las transacciones de
+   `Fuente = TC Davivienda` con `Mes = <mes actual>` que sean anteriores a
+   la fecha de ese pago ya quedaron cubiertas por él (ciclo anterior, ya
+   pagado) y cuáles siguen siendo del ciclo actual (aún sin pagar). NO lo
+   asumas solo por fecha — no hay un corte limpio, hay que preguntar (así
+   se descubrió este mismo problema el 22 ago 2026: fechas intermedias
+   como el 15-16 de agosto tenían transacciones de ambos ciclos mezcladas).
+   A las que confirme como ya pagadas, cambiales `Mes` a
+   `"Ciclo anterior (pagado {fecha de pago})"`. Si no llegó ningún pago de
+   TC en esta corrida, saltate este paso.
 
-6. **Avisale a Daniela** (mensaje corto en la conversación, no hace falta
+6. **Recalculá el bloque "💳 Cupo Tarjeta de Crédito Davivienda Lifemiles
+   Gold"** al final de la página "Presupuesto Personal (1)": sumá `Valor`
+   donde `Fuente = TC Davivienda`, `Tipo = Gasto` y `Mes = <mes actual>`
+   (es decir, excluyendo lo ya marcado como "Ciclo anterior"), y actualizá
+   los porcentajes contra $2.500.000 (evitar cuota de manejo) y $3.000.000
+   (cupo máximo). Mantené el formato simple: un número grande, una barra
+   de progreso simple (🟨/⬜️), una alerta de una línea — no la tabla de
+   dos filas que se usó al principio, quedaba muy densa. Actualizá también
+   la fecha de corte.
+
+7. **Avisale a Daniela** (mensaje corto en la conversación, no hace falta
    email) solo si:
    - el gasto de TC del mes acaba de cruzar $2.500.000 o $3.000.000 por
      primera vez en esta corrida, o
