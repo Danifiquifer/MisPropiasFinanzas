@@ -16,7 +16,9 @@ transacción a mano. Es el motivo del desgaste: cada compra requiere abrir la
 categoría correcta y crear una fila. Julio fue el único mes reciente
 completo (18 categorías con datos); el resto de meses quedaron a medias.
 
-Este proyecto no reemplaza esa estructura — la alimenta automáticamente.
+Este proyecto no reemplaza esa estructura — la alimenta automáticamente
+(desde el 22 ago 2026, en ambos sentidos: "Registro de Gastos" también se
+actualiza solo, ver paso 6 más abajo).
 
 ## Arquitectura
 
@@ -24,13 +26,17 @@ No hay servidor ni cron propio. El "agente" son **dos Rutinas programadas
 de Claude Code Remote** que corren con acceso ya autorizado a Gmail y
 Notion de la usuaria (mismos conectores de esta sesión):
 
-1. **Semanal (lunes)** — correos de Falabella/Davivienda → Transacciones.
+1. **Diaria** — correos de Falabella/Davivienda → "🤖 Transacciones
+   (Auto)" → espejo del día en "Registro de Gastos" / "Discriminado".
+   (Era semanal hasta el 22 ago 2026; se cambió a diaria a pedido de
+   Daniela para que "Registro de Gastos" quede al día todos los días, no
+   solo Transacciones (Auto).)
 2. **Mensual (día 20, día de pago)** — salario y cuota hipotecaria, que no
    generan correo y por eso se registran con montos fijos conocidos. Ver
    [`finanzas_agent/nomina.py`](finanzas_agent/nomina.py) y la sección
    "Salario y crédito hipotecario" más abajo.
 
-Cada corrida semanal:
+Cada corrida diaria:
 
 1. Busca en Gmail correos nuevos desde la última corrida:
    - `from:BANCO_DAVIVIENDA@davivienda.com` (movimientos de la TC)
@@ -45,11 +51,18 @@ Cada corrida semanal:
 4. Escribe cada movimiento nuevo en la base de datos de Notion
    **🤖 Transacciones (Auto)** (bajo "Presupuesto Personal (1)"), evitando
    duplicados por `ID Correo` (message id de Gmail).
-5. Recalcula el bloque **"💳 Cupo Tarjeta de Crédito"** al final de la página
-   "Presupuesto Personal (1)" con el total gastado en TC en el mes en curso
-   contra los dos umbrales.
-6. Si el gasto de TC del mes cruza $2.500.000 o $3.000.000 por primera vez,
-   lo avisa.
+5. **Espeja lo del día en "Registro de Gastos"**: crea el mes actual en
+   "Meses Presupuesto YT" si falta, crea la fila de categoría del mes si
+   falta (con su `Tipo de movimiento`), crea la sub-base "Discriminado" de
+   esa categoría si falta, y agrega ahí el movimiento del día. Así
+   "Registro de Gastos" — la base original que Daniela ya usaba — queda al
+   día sin que ella tenga que tocarla.
+6. Recalcula el bloque **"💳 Cupo Tarjeta de Crédito"** al final de la página
+   "Presupuesto Personal (1)" con el total gastado en TC del ciclo de
+   facturación en curso (no del mes calendario, ver más abajo) contra los
+   dos umbrales.
+7. Si el gasto de TC del ciclo cruza $2.500.000 o $3.000.000 por primera
+   vez, lo avisa.
 
 El prompt exacto de la Rutina está versionado en
 [`routine/PROMPT.md`](routine/PROMPT.md).
@@ -193,6 +206,18 @@ Se cargaron manualmente en Notion las transacciones de TC de Davivienda del
 1 al 22 de agosto de 2026 (29 movimientos) más algunas de la cuenta débito
 de Falabella a modo de ejemplo, para dejar el dashboard de cupo funcionando
 desde ya. Tras la reconciliación con Daniela, 18 de esos 29 movimientos
-quedaron marcados como ciclo anterior (ya pagado) y 11 como ciclo actual —
-el cupo real usado en el ciclo vigente es $2.034.925. A partir de aquí la
-Rutina programada mantiene esto al día.
+quedaron marcados como ciclo anterior (ya pagado) y 11 como ciclo actual.
+
+Corrección adicional (22 ago 2026): el correo de Uber del 19 de agosto
+había llegado duplicado (dos notificaciones de Davivienda, `PAYU*UBER`
+$14.767 y `UBER RIDES` $15.135, para el mismo viaje). Además, ese viaje lo
+compartió con una amiga, así que su parte real fue $8.131. Se corrigió la
+primera fila a $8.131 y la segunda se anuló (`Valor = 0`, marcada como
+duplicado — no se borró, para no perder el rastro del correo original).
+
+El cupo real usado en el ciclo vigente, tras ambas correcciones, es
+**$2.013.154**. A partir de aquí la Rutina programada mantiene esto al día
+—incluyendo, desde el mismo 22 ago, el espejo diario en "Registro de
+Gastos" (se creó el mes "Agosto" ahí por primera vez, con las categorías
+Transporte y Comidas y sus correspondientes "Discriminado", para reflejar
+los movimientos del 22 de agosto).

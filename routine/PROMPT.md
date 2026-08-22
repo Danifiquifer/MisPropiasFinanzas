@@ -1,9 +1,13 @@
-# Prompt de la Rutina "Registro de finanzas — Falabella/Davivienda"
+# Prompt de la Rutina "Registro finanzas — diario (Falabella/Davivienda + Registro de Gastos)"
 
 Este es el texto (o una versión muy cercana) que debe llevar la Rutina
 programada de Claude Code Remote que mantiene al día la base de datos
-"🤖 Transacciones (Auto)" en Notion. Se guarda aquí versionado para poder
-ajustarlo sin depender de recordar la configuración exacta.
+"🤖 Transacciones (Auto)" **y** la base original "Registro de Gastos" (con
+sus categorías y sub-bases "Discriminado") en Notion. Corre **diario**
+(cambiado de semanal el 22 ago 2026, a pedido de Daniela, para que
+"Registro de Gastos" quede al día todos los días). Se guarda aquí
+versionado para poder ajustarlo sin depender de recordar la configuración
+exacta.
 
 ---
 
@@ -54,7 +58,28 @@ cada corrida:
    `"Ciclo anterior (pagado {fecha de pago})"`. Si no llegó ningún pago de
    TC en esta corrida, saltate este paso.
 
-6. **Recalculá el bloque "💳 Cupo Tarjeta de Crédito Davivienda Lifemiles
+6. **Espejo diario en "Registro de Gastos"** (base original, con
+   categorías + sub-base "Discriminado" por categoría — desde el 22 ago
+   2026 esto se automatizó también, antes era 100% manual): por cada
+   movimiento nuevo de HOY que quedó en "🤖 Transacciones (Auto)":
+   1. Si no existe todavía una página del mes actual en "Meses
+      Presupuesto YT", creala (`Mes` = nombre del mes, `Fecha` = día 1).
+   2. Si no existe una fila en "Registro de Gastos" con `Nombre` = la
+      Categoría del movimiento relacionada (`Mes`) a ese mes, creala
+      (`Tipo de movimiento`: Ingresos para Salario, Deuda para
+      Crédito hipotecario/deudas, Gastos esenciales para
+      Mercado/Transporte/Servicios/Coco/Maestría, Gastos no esenciales
+      para el resto, Ahorros para Ahorro).
+   3. Si esa página de categoría no tiene todavía una base hija
+      "Discriminado", creala con el esquema
+      `CREATE TABLE ("Concepto" TITLE, "Valor" NUMBER)` (mismo esquema
+      que ya usaba Daniela en meses anteriores).
+   4. Agregá una fila en ese "Discriminado": `Concepto` = comercio +
+      fuente entre paréntesis (ej. "Peaje Fusca (TC Davivienda)"),
+      `Valor` = el monto. No dupliques si ya está (mismo `Concepto` +
+      `Valor` ya cargado ese día).
+
+7. **Recalculá el bloque "💳 Cupo Tarjeta de Crédito Davivienda Lifemiles
    Gold"** al final de la página "Presupuesto Personal (1)": sumá `Valor`
    donde `Fuente = TC Davivienda`, `Tipo = Gasto` y `Mes = <mes actual>`
    (es decir, excluyendo lo ya marcado como "Ciclo anterior"), y actualizá
@@ -64,7 +89,7 @@ cada corrida:
    dos filas que se usó al principio, quedaba muy densa. Actualizá también
    la fecha de corte.
 
-7. **Avisale a Daniela** (mensaje corto en la conversación, no hace falta
+8. **Avisale a Daniela** (mensaje corto en la conversación, no hace falta
    email) solo si:
    - el gasto de TC del mes acaba de cruzar $2.500.000 o $3.000.000 por
      primera vez en esta corrida, o
@@ -95,4 +120,4 @@ y `nomina-{AAAA}-{MM}-hipotecario` → verificar que no existan ya en
 Ingreso $6.000.000 / Crédito hipotecario Gasto $1.500.000, Fuente "Otro",
 Estado "Confirmado", Fecha = 20 del mes). Si algún monto cambió, preguntar
 antes de asumir. No toca "Registro de Gastos" ni el bloque de cupo de TC
-— eso es de la Rutina semanal.
+— eso es de la Rutina diaria.
