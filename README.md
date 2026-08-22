@@ -20,9 +20,17 @@ Este proyecto no reemplaza esa estructura — la alimenta automáticamente.
 
 ## Arquitectura
 
-No hay servidor ni cron propio. El "agente" es una **Rutina programada de
-Claude Code Remote** que corre con acceso ya autorizado a Gmail y Notion de
-la usuaria (mismos conectores de esta sesión). Cada corrida:
+No hay servidor ni cron propio. El "agente" son **dos Rutinas programadas
+de Claude Code Remote** que corren con acceso ya autorizado a Gmail y
+Notion de la usuaria (mismos conectores de esta sesión):
+
+1. **Semanal (lunes)** — correos de Falabella/Davivienda → Transacciones.
+2. **Mensual (día 20, día de pago)** — salario y cuota hipotecaria, que no
+   generan correo y por eso se registran con montos fijos conocidos. Ver
+   [`finanzas_agent/nomina.py`](finanzas_agent/nomina.py) y la sección
+   "Salario y crédito hipotecario" más abajo.
+
+Cada corrida semanal:
 
 1. Busca en Gmail correos nuevos desde la última corrida:
    - `from:BANCO_DAVIVIENDA@davivienda.com` (movimientos de la TC)
@@ -126,11 +134,15 @@ consigna, porque Davivienda descuenta la cuota hipotecaria **directo de
 nómina** antes de la consignación.
 
 Ni la consignación del salario ni ese descuento pasan por Falabella
-(débito) o Davivienda (TC) — no generan correo. Por lo tanto **el agente
-nunca va a poder registrar automáticamente ninguna de las dos líneas**;
-quedan fuera del alcance de `finanzas_agent/parsers.py` por diseño, no por
-un bug. Se mantienen como las dos únicas líneas 100% manuales del
-presupuesto.
+(débito) o Davivienda (TC) — no generan correo. Por eso no se detectan con
+`finanzas_agent/parsers.py`, pero **sí se automatizaron**: como el salario
+es fijo y la cuota se descuenta siempre el mismo día (20), la Rutina
+mensual "Registro nómina fija" los registra directamente en Transacciones
+(Auto) cada mes, sin depender de ningún correo. La lógica y los montos
+están en [`finanzas_agent/nomina.py`](finanzas_agent/nomina.py)
+(`SALARIO_BRUTO`, `CUOTA_HIPOTECARIA`, `DIA_PAGO`) — si el salario sube o
+la cuota cambia, hay que actualizar esas constantes (la Rutina está
+instruida para preguntar antes de asumir un cambio, no para adivinarlo).
 
 ## Categorización
 

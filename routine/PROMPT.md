@@ -58,3 +58,22 @@ cada corrida:
 
 No se registran gastos en efectivo (eso lo sigue llevando Daniela a mano,
 marcado `Fuente = Efectivo` si algún día se automatiza).
+
+---
+
+# Prompt de la Rutina "Registro nómina fija — Salario y crédito hipotecario"
+
+Rutina mensual (día 20, día de pago), separada de la anterior porque no
+depende de correos — el salario y la cuota hipotecaria nunca generan un
+correo de Falabella ni Davivienda (la cuota se descuenta directo de
+nómina antes de la consignación). Ver `finanzas_agent/nomina.py` para los
+montos (`SALARIO_BRUTO`, `CUOTA_HIPOTECARIA`) y la generación del `ID
+Correo` sintético usado para deduplicar entre corridas.
+
+Pasos: identificar mes/año actual → construir `nomina-{AAAA}-{MM}-salario`
+y `nomina-{AAAA}-{MM}-hipotecario` → verificar que no existan ya en
+"🤖 Transacciones (Auto)" → si no existen, crear las dos filas (Salario
+Ingreso $6.000.000 / Crédito hipotecario Gasto $1.500.000, Fuente "Otro",
+Estado "Confirmado", Fecha = 20 del mes). Si algún monto cambió, preguntar
+antes de asumir. No toca "Registro de Gastos" ni el bloque de cupo de TC
+— eso es de la Rutina semanal.
