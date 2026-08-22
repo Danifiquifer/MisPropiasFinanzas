@@ -208,16 +208,23 @@ de Falabella a modo de ejemplo, para dejar el dashboard de cupo funcionando
 desde ya. Tras la reconciliación con Daniela, 18 de esos 29 movimientos
 quedaron marcados como ciclo anterior (ya pagado) y 11 como ciclo actual.
 
-Corrección adicional (22 ago 2026): el correo de Uber del 19 de agosto
-había llegado duplicado (dos notificaciones de Davivienda, `PAYU*UBER`
-$14.767 y `UBER RIDES` $15.135, para el mismo viaje). Además, ese viaje lo
-compartió con una amiga, así que su parte real fue $8.131. Se corrigió la
-primera fila a $8.131 y la segunda se anuló (`Valor = 0`, marcada como
-duplicado — no se borró, para no perder el rastro del correo original).
+Correcciones adicionales (22 ago 2026):
+- El correo de Uber del 19 de agosto había llegado duplicado (dos
+  notificaciones de Davivienda, `PAYU*UBER` $14.767 y `UBER RIDES`
+  $15.135, para el mismo viaje). Además, ese viaje lo compartió con una
+  amiga, así que su parte real fue $8.131. Se corrigió la primera fila a
+  $8.131 y la segunda se anuló (`Valor = 0`, marcada como duplicado — no
+  se borró, para no perder el rastro del correo original).
+- True Blue (15 ago), Lozano Muñoz (17 ago) y Rappi (18 ago) se habían
+  dejado como ciclo actual en la primera reconciliación, pero Daniela
+  confirmó que en realidad también quedaron pagados con el PSE de
+  $3.511.179 del 20 de agosto — se movieron a "Ciclo anterior (pagado 20
+  ago)" junto con el resto.
 
-El cupo real usado en el ciclo vigente, tras ambas correcciones, es
-**$2.013.154**. A partir de aquí la Rutina programada mantiene esto al día
-—incluyendo, desde el mismo 22 ago, el espejo diario en "Registro de
-Gastos" (se creó el mes "Agosto" ahí por primera vez, con las categorías
-Transporte y Comidas y sus correspondientes "Discriminado", para reflejar
-los movimientos del 22 de agosto).
+El cupo real usado en el ciclo vigente, tras todas las correcciones, es
+**$1.773.611** (solo Uber $8.131 + todo del 20 al 22 de agosto, incluida
+la cuota de la maestría $1.676.480). A partir de aquí la Rutina programada
+mantiene esto al día —incluyendo, desde el mismo 22 ago, el espejo diario
+en "Registro de Gastos" (se creó el mes "Agosto" ahí por primera vez, con
+las categorías Transporte y Comidas y sus correspondientes "Discriminado",
+para reflejar los movimientos del 22 de agosto).
