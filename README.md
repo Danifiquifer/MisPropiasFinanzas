@@ -116,6 +116,22 @@ Se registra como `Tipo = Ingreso`.
 > tarjeta débito en punto de venta (solo PSE y transferencias). Si eso
 > cambia, hay que agregar un parser nuevo.
 
+## Salario y crédito hipotecario — caso especial, siempre manual
+
+Daniela recibe salario el día 20 de cada mes. El presupuesto en Notion
+registra **Salario = $6.000.000** (bruto) y, por separado, **Crédito
+hipotecario = $1.500.000** como deuda. Los números cuadran:
+$6.000.000 − $1.500.000 = **$4.500.000**, que es lo que realmente se
+consigna, porque Davivienda descuenta la cuota hipotecaria **directo de
+nómina** antes de la consignación.
+
+Ni la consignación del salario ni ese descuento pasan por Falabella
+(débito) o Davivienda (TC) — no generan correo. Por lo tanto **el agente
+nunca va a poder registrar automáticamente ninguna de las dos líneas**;
+quedan fuera del alcance de `finanzas_agent/parsers.py` por diseño, no por
+un bug. Se mantienen como las dos únicas líneas 100% manuales del
+presupuesto.
+
 ## Categorización
 
 `finanzas_agent/categorizer.py` mapea palabras clave del comercio a las
